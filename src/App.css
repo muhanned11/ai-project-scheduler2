@@ -2406,3 +2406,46 @@ button:active::after {
   color: #374151;
   text-transform: capitalize;
 }
+@media print {
+  /* Print page setup */
+  @page {
+    size: landscape;
+    margin: 10mm;
+  }
+
+  /* Hide everything by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Only show the gantt print area */
+  .print-gantt,
+  .print-gantt * {
+    visibility: visible;
+  }
+
+  /* Place it at the top-left and use full width */
+  .print-gantt {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Remove UI that wastes print space */
+  .app-header,
+  .toolbar,
+  .copyright-footer,
+  .chat-panel,
+  .modal-overlay {
+    display: none !important;
+  }
+
+  /* Improve table/grid clarity on paper */
+  .print-gantt div {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

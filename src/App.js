@@ -95,6 +95,11 @@ function App() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
+  // ✅ PRINT
+  const handlePrint = () => {
+    window.print();
+  };
+
   // API config
   const isDevelopment =
     window.location.hostname === "localhost" ||
@@ -221,9 +226,7 @@ function App() {
   };
 
   const deleteProject = async (projectId) => {
-    if (
-      !window.confirm("Delete this project? This cannot be undone.")
-    ) {
+    if (!window.confirm("Delete this project? This cannot be undone.")) {
       return;
     }
     try {
@@ -536,7 +539,7 @@ function App() {
   const formatCellLabel = (scale, startDate) => {
     const m = startDate.getMonth();
     const y = startDate.getFullYear();
-    const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const mon = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     if (scale === "day") return String(startDate.getDate());
     if (scale === "week") return `W${getWeekNumber(startDate)}`;
     if (scale === "month") return mon[m];
@@ -546,7 +549,7 @@ function App() {
 
   const formatCellSubLabel = (scale, startDate) => {
     const y = startDate.getFullYear();
-    const day = ["S","M","T","W","T","F","S"][startDate.getDay()];
+    const day = ["S", "M", "T", "W", "T", "F", "S"][startDate.getDay()];
     if (scale === "day") return day;
     if (scale === "week") {
       const weekEnd = new Date(startDate);
@@ -584,7 +587,7 @@ function App() {
 
   const buildTopHeaders = (topTier, cells) => {
     if (!topTier) return [];
-    const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const mon = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     const headers = [];
     let currentKey = null;
     let accWidth = 0;
@@ -619,7 +622,7 @@ function App() {
     return headers;
   };
 
-  // ===== AI COMMAND (kept, but you can simplify later) =====
+  // ===== AI COMMAND =====
   const processAICommand = async () => {
     if (!aiCommand.trim() || !currentProject) return;
     setIsProcessingCommand(true);
@@ -692,7 +695,11 @@ Return COMPLETE updated project JSON.`,
       const responseText = data.content?.find((b) => b.type === "text")?.text || "";
       if (!responseText) throw new Error("No response from AI");
 
-      let cleaned = responseText.trim().replace(/```json\s*/g, "").replace(/```\s*/g, "").replace(/`/g, "");
+      let cleaned = responseText
+        .trim()
+        .replace(/```json\s*/g, "")
+        .replace(/```\s*/g, "")
+        .replace(/`/g, "");
       const first = cleaned.indexOf("{");
       const last = cleaned.lastIndexOf("}");
       if (first === -1 || last === -1) throw new Error("AI did not return JSON");
@@ -754,7 +761,7 @@ Return COMPLETE updated project JSON.`,
     }
   };
 
-  // Generate WBS (kept)
+  // Generate WBS
   const generateWBS = async () => {
     if (!projectDescription.trim()) return;
     if (!user) {
@@ -841,7 +848,7 @@ Return ONLY JSON with this shape:
     }
   };
 
-  // Template projects (kept short)
+  // Template projects (short)
   const createTemplateProject = async (type) => {
     if (!user) return alert("Please sign in to create projects");
     const templates = {
@@ -1059,50 +1066,83 @@ Return ONLY JSON with this shape:
         <React.Fragment key={node.id}>
           <div style={{ display: "flex", borderBottom: "1px solid #e5e7eb" }}>
             {/* Line */}
-            <div style={{
-              width: "50px", minWidth: "50px", padding: "0.75rem",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              background: node.level === 1 ? "#f9fafb" : "white",
-              borderRight: "1px solid #e5e7eb", height: "48px"
-            }}>
-              <span style={{
-                color: "#9ca3af", fontWeight: "500", fontSize: "0.75rem",
-                fontFamily: "monospace"
-              }}>
+            <div
+              style={{
+                width: "50px",
+                minWidth: "50px",
+                padding: "0.75rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: node.level === 1 ? "#f9fafb" : "white",
+                borderRight: "1px solid #e5e7eb",
+                height: "48px",
+              }}
+            >
+              <span
+                style={{
+                  color: "#9ca3af",
+                  fontWeight: "500",
+                  fontSize: "0.75rem",
+                  fontFamily: "monospace",
+                }}
+              >
                 {node.lineNumber}
               </span>
             </div>
 
             {/* WBS */}
-            <div style={{
-              width: "70px", minWidth: "70px", padding: "0.75rem",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              background: node.level === 1 ? "#f9fafb" : "white",
-              borderRight: "2px solid #e5e7eb", height: "48px"
-            }}>
-              <span style={{
-                color: "#2563eb", fontWeight: "700", fontSize: "0.75rem",
-                fontFamily: "monospace"
-              }}>
+            <div
+              style={{
+                width: "70px",
+                minWidth: "70px",
+                padding: "0.75rem",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: node.level === 1 ? "#f9fafb" : "white",
+                borderRight: "2px solid #e5e7eb",
+                height: "48px",
+              }}
+            >
+              <span
+                style={{
+                  color: "#2563eb",
+                  fontWeight: "700",
+                  fontSize: "0.75rem",
+                  fontFamily: "monospace",
+                }}
+              >
                 {node.id}
               </span>
             </div>
 
             {/* Name */}
-            <div style={{
-              width: "320px", minWidth: "320px", padding: "0.75rem",
-              paddingLeft: `${0.75 + depth * 1.5}rem`,
-              display: "flex", alignItems: "center",
-              background: node.level === 1 ? "#f9fafb" : "white",
-              borderRight: "2px solid #e5e7eb", height: "48px"
-            }}>
+            <div
+              style={{
+                width: "320px",
+                minWidth: "320px",
+                padding: "0.75rem",
+                paddingLeft: `${0.75 + depth * 1.5}rem`,
+                display: "flex",
+                alignItems: "center",
+                background: node.level === 1 ? "#f9fafb" : "white",
+                borderRight: "2px solid #e5e7eb",
+                height: "48px",
+              }}
+            >
               {hasChildren ? (
                 <button
                   onClick={() => toggleNodeExpansion(node.id)}
                   style={{
-                    background: "none", border: "none", cursor: "pointer",
-                    padding: 0, marginRight: "0.5rem",
-                    display: "flex", alignItems: "center", color: "#6b7280"
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                    marginRight: "0.5rem",
+                    display: "flex",
+                    alignItems: "center",
+                    color: "#6b7280",
                   }}
                 >
                   {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -1110,11 +1150,15 @@ Return ONLY JSON with this shape:
               ) : (
                 <span style={{ width: "24px", marginRight: "0.5rem" }} />
               )}
-              <span style={{
-                fontWeight: node.level === 1 ? "700" : "500",
-                fontSize: node.level === 1 ? "1rem" : "0.875rem",
-                whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
-              }}>
+              <span
+                style={{
+                  fontWeight: node.level === 1 ? "700" : "500",
+                  fontSize: node.level === 1 ? "1rem" : "0.875rem",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
                 {node.name}
               </span>
             </div>
@@ -1138,30 +1182,54 @@ Return ONLY JSON with this shape:
                 onClick={() => setSelectedTask(node)}
                 title={`${node.name}\n${node.startDate} → ${node.endDate}\n${node.progress}%`}
               >
-                <div style={{
-                  position: "absolute", left: 0, top: 0, height: "100%",
-                  width: `${node.progress}%`, background: "rgba(255,255,255,0.3)",
-                  transition: "width 0.3s"
-                }} />
-                <div style={{
-                  position: "relative", zIndex: 1, display: "flex",
-                  alignItems: "center", gap: "8px", padding: "0 12px",
-                  width: "100%", justifyContent: "space-between"
-                }}>
-                  <span style={{
-                    fontSize: "0.75rem", fontWeight: "600", color: "white",
-                    textShadow: "0 1px 2px rgba(0,0,0,0.3)",
-                    whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                    flex: 1
-                  }}>
+                <div
+                  style={{
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    height: "100%",
+                    width: `${node.progress}%`,
+                    background: "rgba(255,255,255,0.3)",
+                    transition: "width 0.3s",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "relative",
+                    zIndex: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    padding: "0 12px",
+                    width: "100%",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "0.75rem",
+                      fontWeight: "600",
+                      color: "white",
+                      textShadow: "0 1px 2px rgba(0,0,0,0.3)",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      flex: 1,
+                    }}
+                  >
                     {node.name}
                   </span>
-                  <span style={{
-                    fontSize: "0.7rem", fontWeight: "700", color: "white",
-                    textShadow: "0 1px 2px rgba(0,0,0,0.3)",
-                    backgroundColor: "rgba(0,0,0,0.2)",
-                    padding: "2px 6px", borderRadius: "4px"
-                  }}>
+                  <span
+                    style={{
+                      fontSize: "0.7rem",
+                      fontWeight: "700",
+                      color: "white",
+                      textShadow: "0 1px 2px rgba(0,0,0,0.3)",
+                      backgroundColor: "rgba(0,0,0,0.2)",
+                      padding: "2px 6px",
+                      borderRadius: "4px",
+                    }}
+                  >
                     {node.progress}%
                   </span>
                 </div>
@@ -1173,7 +1241,9 @@ Return ONLY JSON with this shape:
     };
 
     return (
+      // ✅ THIS is the printable area
       <div
+        className="print-gantt"
         style={{
           background: "white",
           borderRadius: "1rem",
@@ -1212,10 +1282,7 @@ Return ONLY JSON with this shape:
           </div>
 
           {/* Timescale headers */}
-          <div
-            style={{ flex: 1, overflowX: "auto" }}
-            onWheel={handleGanttWheel}
-          >
+          <div style={{ flex: 1, overflowX: "auto" }} onWheel={handleGanttWheel}>
             <div style={{ display: "flex", flexDirection: "column" }}>
               {topHeaders.length > 0 && (
                 <div style={{ display: "flex" }}>
@@ -1864,6 +1931,7 @@ Return ONLY JSON with this shape:
             )}
           </div>
 
+          {/* stats blocks kept as-is (your code) */}
           {projectStats && (
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "1rem" }}>
               <div className="stat-card-small" onClick={() => handleStatusClick("all")} style={{ cursor: "pointer" }}>
@@ -1967,25 +2035,43 @@ Return ONLY JSON with this shape:
           </div>
 
           <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            {/* ✅ PRINT GROUP (separated) */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                paddingRight: "1rem",
+                marginRight: "0.75rem",
+                borderRight: "2px solid #e5e7eb",
+              }}
+            >
+              <button onClick={handlePrint} className="btn-view">
+                Print
+              </button>
+            </div>
+
+            {/* ✅ ZOOM ONLY FOR GANTT */}
             {viewMode === "gantt" && (
-              <div style={{ display: "flex", gap: "0.25rem", marginRight: "0.5rem", alignItems: "center" }}>
+              <div style={{ display: "flex", gap: "0.25rem", alignItems: "center" }}>
                 <button onClick={() => handleZoom("in")} title="Zoom In">
                   <ZoomIn size={18} />
                 </button>
 
-                <div style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  padding: "0.5rem 1rem",
-                  background: "white",
-                  borderRadius: "0.5rem",
-                  border: "2px solid #e5e7eb",
-                  fontSize: "0.875rem",
-                  fontWeight: 800,
-                  minWidth: "140px",
-                  justifyContent: "center",
-                }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    padding: "0.5rem 1rem",
+                    background: "white",
+                    borderRadius: "0.5rem",
+                    border: "2px solid #e5e7eb",
+                    fontSize: "0.875rem",
+                    fontWeight: 800,
+                    minWidth: "140px",
+                    justifyContent: "center",
+                  }}
+                >
                   <span style={{ textTransform: "capitalize" }}>{timeScale}</span>
                   <span style={{ color: "#9ca3af", fontSize: "0.75rem" }}>
                     ({(ganttZoom * 100).toFixed(0)}%)
@@ -2107,9 +2193,7 @@ Return ONLY JSON with this shape:
           <div className="modal" style={{ maxWidth: "600px" }}>
             <div className="modal-header">
               <h3>Add New Task/Phase</h3>
-              <button onClick={() => setShowAddTaskModal(false)} className="modal-close">
-                ×
-              </button>
+              <button onClick={() => setShowAddTaskModal(false)} className="modal-close">×</button>
             </div>
 
             <div className="modal-body">
@@ -2231,12 +2315,8 @@ Return ONLY JSON with this shape:
             </div>
 
             <div className="modal-footer">
-              <button onClick={() => setShowAddTaskModal(false)} className="btn-secondary">
-                Cancel
-              </button>
-              <button onClick={addTaskManually} className="btn-primary">
-                Add
-              </button>
+              <button onClick={() => setShowAddTaskModal(false)} className="btn-secondary">Cancel</button>
+              <button onClick={addTaskManually} className="btn-primary">Add</button>
             </div>
           </div>
         </div>
@@ -2246,11 +2326,9 @@ Return ONLY JSON with this shape:
       {currentProject && <ChatHistoryPanel />}
 
       {/* Footer */}
-      <div className="copyright-footer">
-        © 2025 AI Project Scheduler
-      </div>
+      <div className="copyright-footer">© 2025 AI Project Scheduler</div>
 
-      {/* Optional simple task details popup */}
+      {/* Task popup */}
       {selectedTask && (
         <div
           onClick={() => setSelectedTask(null)}
