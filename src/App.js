@@ -1,4 +1,4 @@
-// src/App.js
+// Print button layout src/App.js
 import React, { useState, useEffect, useMemo } from "react";
 import {
   ChevronRight,
