@@ -2449,3 +2449,70 @@ button:active::after {
     print-color-adjust: exact;
   }
 }
+.resources-wrap {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 2px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.resources-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 2px solid #e5e7eb;
+  background: #f8fafc;
+}
+
+.resources-title {
+  font-weight: 800;
+  font-size: 16px;
+  color: #0f172a;
+}
+
+.resources-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.resources-table-wrap {
+  overflow: auto;
+  max-height: calc(100vh - 290px);
+}
+
+.resources-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.resources-table thead th {
+  position: sticky;
+  top: 0;
+  background: #1e40af;
+  color: white;
+  text-align: left;
+  padding: 10px;
+  border-bottom: 2px solid rgba(255,255,255,0.15);
+}
+
+.resources-table tbody td {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 8px;
+  background: #fff;
+}
+
+.cell-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  outline: none;
+}
+
+.cell-input:focus {
+  border-color: #3b82f6;
+}

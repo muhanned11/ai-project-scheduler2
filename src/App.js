@@ -17,6 +17,7 @@ import {
   Search,
   Filter,
   X,
+
   CheckCircle,
   Clock,
   Play,
@@ -62,6 +63,20 @@ function App() {
   const [conversationHistory, setConversationHistory] = useState([]);
   const [viewMode, setViewMode] = useState("gantt");
   const [selectedTask, setSelectedTask] = useState(null);
+  // ===== Resource Center =====
+const [resources, setResources] = useState([]); // Resource Center data
+
+// Make sure currentProject has resources array
+useEffect(() => {
+  if (!currentProject) return;
+  if (!Array.isArray(currentProject.resources)) {
+    const updated = { ...currentProject, resources: [] };
+    setCurrentProject(updated);
+    saveProject(updated);
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [currentProject?.id]);
+
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -335,6 +350,49 @@ function App() {
         if (n.children?.length) return { ...n, children: updateNode(n.children) };
         return n;
       });
+const addResource = () => {
+  const next = {
+    resourceId: `R-${Date.now()}`, // unique (simple)
+    resourceName: "",
+    type: "labor",        // labor | material | equipment | cost
+    costUnit: "hour",     // hour | day | week | month | year
+    unitPrice: 0,
+  };
+
+  const updated = {
+    ...currentProject,
+    resources: [...(currentProject.resources || []), next],
+    lastModified: new Date().toISOString(),
+  };
+  setCurrentProject(updated);
+  saveProject(updated);
+};
+
+const updateResourceField = (index, field, value) => {
+  const updatedResources = (currentProject.resources || []).map((r, i) =>
+    i === index ? { ...r, [field]: value } : r
+  );
+
+  const updated = {
+    ...currentProject,
+    resources: updatedResources,
+    lastModified: new Date().toISOString(),
+  };
+  setCurrentProject(updated);
+  saveProject(updated);
+};
+
+const deleteResource = (index) => {
+  const updatedResources = (currentProject.resources || []).filter((_, i) => i !== index);
+
+  const updated = {
+    ...currentProject,
+    resources: updatedResources,
+    lastModified: new Date().toISOString(),
+  };
+  setCurrentProject(updated);
+  saveProject(updated);
+};
 
     const updatedProject = {
       ...currentProject,
@@ -1526,7 +1584,9 @@ Return ONLY JSON with this shape:
               border: "2px solid #e5e7eb",
               padding: "1rem",
             }}
+            
           >
+            
             <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
               <button
                 onClick={() => hasChildren && toggleNodeExpansion(node.id)}
@@ -1604,6 +1664,7 @@ Return ONLY JSON with this shape:
       );
     };
 
+
     return (
       <div className="wbs-view">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", padding: "1rem", background: "white", borderRadius: "0.75rem", border: "2px solid #e5e7eb" }}>
@@ -1626,6 +1687,157 @@ Return ONLY JSON with this shape:
       </div>
     );
   };
+
+  // ===== Resource Center View =====
+  // ===== Resources CRUD =====
+const addResource = () => {
+  const next = {
+    resourceId: `R-${Date.now()}`,
+    resourceName: "",
+    type: "Labor",
+    costUnit: "hour",
+    unitPrice: 0,
+  };
+
+  const updated = {
+    ...currentProject,
+    resources: [...(currentProject?.resources || []), next],
+    lastModified: new Date().toISOString(),
+  };
+
+  setCurrentProject(updated);
+  saveProject(updated);
+};
+
+const updateResourceField = (index, field, value) => {
+  const updatedResources = (currentProject?.resources || []).map((r, i) =>
+    i === index ? { ...r, [field]: value } : r
+  );
+
+  const updated = {
+    ...currentProject,
+    resources: updatedResources,
+    lastModified: new Date().toISOString(),
+  };
+
+  setCurrentProject(updated);
+  saveProject(updated);
+};
+
+const deleteResource = (index) => {
+  const updatedResources = (currentProject?.resources || []).filter((_, i) => i !== index);
+
+  const updated = {
+    ...currentProject,
+    resources: updatedResources,
+    lastModified: new Date().toISOString(),
+  };
+
+  setCurrentProject(updated);
+  saveProject(updated);
+};
+
+  const renderResourcesView = () => {
+  const resourcesList = currentProject?.resources || [];
+
+  return (
+    <div className="resources-view" style={{ padding: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+        <h3 style={{ margin: 0 }}>Resource Center</h3>
+
+        <button onClick={addResource} className="btn-add">
+          <Plus size={16} /> Add Resource
+        </button>
+      </div>
+
+      <table className="table-view">
+        <thead>
+          <tr>
+            <th>Resource ID</th>
+            <th>Resource Name</th>
+            <th>Type</th>
+            <th>Cost Unit</th>
+            <th>Unit Price</th>
+            <th style={{ width: 80 }}>Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {resourcesList.length === 0 ? (
+            <tr>
+              <td colSpan={6} style={{ padding: "1rem", color: "#6b7280" }}>
+                No resources yet. Click <b>Add Resource</b>.
+              </td>
+            </tr>
+          ) : (
+            resourcesList.map((r, idx) => (
+              <tr key={r.resourceId || idx}>
+                <td>
+                  <input
+                    className="table-input"
+                    value={r.resourceId || ""}
+                    onChange={(e) => updateResourceField(idx, "resourceId", e.target.value)}
+                  />
+                </td>
+
+                <td>
+                  <input
+                    className="table-input"
+                    value={r.resourceName || ""}
+                    onChange={(e) => updateResourceField(idx, "resourceName", e.target.value)}
+                    placeholder="e.g., Electrician"
+                  />
+                </td>
+
+                <td>
+                  <select
+                    className="table-input"
+                    value={r.type || "labor"}
+                    onChange={(e) => updateResourceField(idx, "type", e.target.value)}
+                  >
+                    <option value="labor">labor</option>
+                    <option value="material">material</option>
+                    <option value="equipment">equipment</option>
+                    <option value="cost">cost</option>
+                  </select>
+                </td>
+
+                <td>
+                  <select
+                    className="table-input"
+                    value={r.costUnit || "hour"}
+                    onChange={(e) => updateResourceField(idx, "costUnit", e.target.value)}
+                  >
+                    <option value="hour">hour</option>
+                    <option value="day">day</option>
+                    <option value="week">week</option>
+                    <option value="month">month</option>
+                    <option value="year">year</option>
+                  </select>
+                </td>
+
+                <td>
+                  <input
+                    className="table-input"
+                    type="number"
+                    value={Number(r.unitPrice || 0)}
+                    onChange={(e) => updateResourceField(idx, "unitPrice", Number(e.target.value || 0))}
+                    min="0"
+                  />
+                </td>
+
+                <td>
+                  
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 
   // ===== Chat Panel =====
   const ChatHistoryPanel = () => {
@@ -2019,6 +2231,13 @@ Return ONLY JSON with this shape:
               <button onClick={() => setViewMode("wbs")} className={`btn-view ${viewMode === "wbs" ? "active" : ""}`}>
                 <Grid3x3 size={16} /> WBS
               </button>
+              <button
+  onClick={() => setViewMode("resources")}
+  className={`btn-view ${viewMode === "resources" ? "active" : ""}`}
+>
+  <Users size={16} /> Resources
+</button>
+
             </div>
 
             <button onClick={() => setShowAddTaskModal(true)} className="btn-add" style={{ marginLeft: "0.5rem" }}>
@@ -2183,6 +2402,7 @@ Return ONLY JSON with this shape:
             {viewMode === "gantt" && renderGanttView()}
             {viewMode === "table" && renderTableView()}
             {viewMode === "wbs" && renderWBSView()}
+            {viewMode === "resources" && renderResourcesView()}
           </div>
         )}
       </main>
